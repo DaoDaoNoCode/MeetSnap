@@ -43,7 +43,13 @@ brew install --cask meetsnap
 
 ### Download
 
-Grab the latest `.app` from [Releases](https://github.com/DaoDaoNoCode/MeetSnap/releases), drop it in `/Applications`, and right-click > Open the first time.
+1. Grab the latest zip from [Releases](https://github.com/DaoDaoNoCode/MeetSnap/releases)
+2. Unzip and move `MeetSnap.app` to `/Applications`
+3. Remove the quarantine flag (unsigned app):
+   ```
+   xattr -cr /Applications/MeetSnap.app
+   ```
+4. Open MeetSnap from Applications
 
 ### Build from Source
 
