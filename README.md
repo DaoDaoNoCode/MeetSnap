@@ -30,7 +30,18 @@ MeetSnap sits in your menu bar and brings your meeting back to the front with a 
 
 ## Install
 
-### Homebrew (Recommended)
+### Build from Source (Recommended)
+
+```bash
+git clone https://github.com/DaoDaoNoCode/MeetSnap.git
+cd MeetSnap
+bash build.sh
+cp -R MeetSnap.app /Applications/
+```
+
+Requires Xcode Command Line Tools (`xcode-select --install`). Works with any recent Swift version.
+
+### Homebrew
 
 ```
 brew tap daodaonocode/tap
@@ -44,16 +55,7 @@ Then copy to Applications (shown in post-install caveats):
 cp -R $(brew --prefix)/Cellar/meetsnap/1.0/MeetSnap.app /Applications/
 ```
 
-### Build from Source
-
-```bash
-git clone https://github.com/DaoDaoNoCode/MeetSnap.git
-cd MeetSnap
-bash build.sh
-cp -R MeetSnap.app /Applications/
-```
-
-Requires Xcode Command Line Tools (`xcode-select --install`).
+> **Note:** Homebrew requires your Xcode version to match your macOS version. If you see an "Xcode is too outdated" error, use the Build from Source method above instead — it's more forgiving.
 
 ## Usage
 
