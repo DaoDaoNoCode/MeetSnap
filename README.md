@@ -6,8 +6,6 @@
 
 <p align="center">
   <strong>One-click access to your active Google Meet tab.</strong>
-  <br>
-  A tiny macOS menu bar app that brings your meeting back to the front — from any app.
 </p>
 
 <p align="center">
@@ -18,19 +16,17 @@
 
 ---
 
-## Why
-
 You're multitasking during a Google Meet call. Someone says your name. It takes you 10 seconds to find the right Chrome tab.
 
-MeetSnap fixes that. Click the menu bar icon and you're back in your meeting instantly.
+MeetSnap sits in your menu bar and brings your meeting back to the front with a single click — from any app, any desktop.
 
-## How It Works
+## Features
 
-- **Outline icon** — no active meeting
-- **Filled icon** — you have a meeting running, click to switch to it
-- **Right-click** — Launch at Login, About, Quit
-
-The app watches for Chrome tabs with an active Google Meet URL. When you click the icon, it brings that tab to the front — from any app, any desktop.
+- **Click to switch** — click the menu bar icon to instantly focus your active Meet tab in Chrome
+- **At-a-glance status** — outlined icon means no meeting, filled icon means you're in one
+- **Smart polling** — only checks Chrome when it's running, zero CPU otherwise
+- **Launch at Login** — right-click the icon to enable
+- **First-run onboarding** — guides you through the one-time Automation permission setup
 
 ## Install
 
@@ -42,6 +38,12 @@ brew trust daodaonocode/tap
 brew install meetsnap
 ```
 
+Then copy to Applications (shown in post-install caveats):
+
+```
+cp -R $(brew --prefix)/Cellar/meetsnap/1.0/MeetSnap.app /Applications/
+```
+
 ### Build from Source
 
 ```bash
@@ -49,14 +51,30 @@ git clone https://github.com/DaoDaoNoCode/MeetSnap.git
 cd MeetSnap
 bash build.sh
 cp -R MeetSnap.app /Applications/
-open /Applications/MeetSnap.app
 ```
 
 Requires Xcode Command Line Tools (`xcode-select --install`).
 
+## Usage
+
+| Action | Result |
+|---|---|
+| **Left-click** the menu bar icon | Switches to your active Google Meet tab |
+| **Right-click** the menu bar icon | Shows menu: Launch at Login, About, Quit |
+| Icon is **outlined** | No active meeting detected |
+| Icon is **filled** | You have a meeting running — click to go back |
+
 ## Permissions
 
-On first launch, macOS will ask you to grant Automation permission for Google Chrome. This is required so MeetSnap can find and switch to your Meet tab. You can manage this in **System Settings > Privacy & Security > Automation**.
+On first launch, macOS will ask you to grant Automation permission for Google Chrome. This allows MeetSnap to find and switch to your Meet tab.
+
+If you accidentally deny it, go to **System Settings > Privacy & Security > Automation** and enable Google Chrome under MeetSnap.
+
+## How It Works
+
+MeetSnap uses macOS [NSWorkspace](https://developer.apple.com/documentation/appkit/nsworkspace) notifications to detect when Chrome launches or quits. While Chrome is running, it checks every 15 seconds (via AppleScript on a background thread) for tabs matching `meet.google.com` with an active meeting code. When you click the icon, it tells Chrome to activate that tab and bring the window to the front.
+
+The entire app is ~450 lines of Swift with zero dependencies.
 
 ## Requirements
 
@@ -65,4 +83,4 @@ On first launch, macOS will ask you to grant Automation permission for Google Ch
 
 ## License
 
-MIT
+[MIT](LICENSE)
