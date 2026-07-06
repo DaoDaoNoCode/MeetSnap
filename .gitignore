@@ -1,0 +1,10 @@
+.build/
+MeetSnap.app/
+.swiftpm/
+*.xcodeproj/
+xcuserdata/
+DerivedData/
+build/
+*.dmg
+*.zip
+.DS_Store
