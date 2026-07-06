@@ -37,7 +37,8 @@ The app watches for Chrome tabs with an active Google Meet URL. When you click t
 ### Homebrew (Recommended)
 
 ```
-brew tap DaoDaoNoCode/tap
+brew tap daodaonocode/tap
+brew trust daodaonocode/tap
 brew install meetsnap
 ```
 
