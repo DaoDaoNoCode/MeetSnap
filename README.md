@@ -36,24 +36,10 @@ The app watches for Chrome tabs with an active Google Meet URL. When you click t
 
 ### Homebrew (Recommended)
 
-The easiest way — no warnings, no extra steps:
-
 ```
 brew tap DaoDaoNoCode/tap
-brew install --cask meetsnap
+brew install meetsnap
 ```
-
-### Manual Download
-
-1. Grab the latest `.dmg` from [Releases](https://github.com/DaoDaoNoCode/MeetSnap/releases)
-2. Open the DMG and drag MeetSnap to Applications
-3. Run this once in Terminal to allow the unsigned app:
-   ```
-   xattr -cr /Applications/MeetSnap.app
-   ```
-4. Open MeetSnap
-
-> **Why?** MeetSnap is free and open source but not code-signed with an Apple Developer certificate ($99/year). The `xattr` command removes the quarantine flag macOS adds to downloaded apps. This is a one-time step — Homebrew does it automatically.
 
 ### Build from Source
 
@@ -61,7 +47,8 @@ brew install --cask meetsnap
 git clone https://github.com/DaoDaoNoCode/MeetSnap.git
 cd MeetSnap
 bash build.sh
-open MeetSnap.app
+cp -R MeetSnap.app /Applications/
+open /Applications/MeetSnap.app
 ```
 
 Requires Xcode Command Line Tools (`xcode-select --install`).
