@@ -14,10 +14,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
         guard let button = statusItem.button else { return }
-        button.image = Icon.make(active: false)
         button.target = self
         button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         button.action = #selector(handleClick)
+
+        Icon.setup(button: button)
 
         let wsnc = NSWorkspace.shared.notificationCenter
         wsnc.addObserver(
@@ -31,11 +32,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         if OnboardingWindowController.hasSeenOnboarding {
             if isChromeRunning() {
+                silentCheck()
                 startPolling()
             }
         } else {
             onboarding.show { [weak self] in
                 if self?.isChromeRunning() == true {
+                    self?.silentCheck()
                     self?.startPolling()
                 }
             }
@@ -61,11 +64,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         setMeetingState(false)
     }
 
+    private func silentCheck() {
+        MeetSwitcher.hasMeeting { [weak self] result in
+            self?.setMeetingState(result == .found)
+        }
+    }
+
     private func startPolling() {
         guard pollTimer == nil else { return }
-        updateState()
         pollTimer = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { [weak self] _ in
-            self?.updateState()
+            self?.silentCheck()
         }
     }
 
@@ -74,24 +82,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         pollTimer = nil
     }
 
-    private func updateState() {
-        MeetSwitcher.hasMeeting { [weak self] result in
-            switch result {
-            case .found:
-                self?.setMeetingState(true)
-            case .notFound, .chromeNotRunning:
-                self?.setMeetingState(false)
-            case .permissionDenied:
-                self?.setMeetingState(false)
-                self?.handlePermissionDenied()
-            }
-        }
-    }
-
     private func setMeetingState(_ active: Bool) {
-        if active != meetingActive {
-            meetingActive = active
-            statusItem.button?.image = Icon.make(active: active)
+        meetingActive = active
+        guard let button = statusItem.button else { return }
+        if active {
+            Icon.setActive(button: button)
+        } else {
+            Icon.setInactive(button: button)
         }
     }
 
@@ -104,30 +101,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func handleClick(_ sender: NSStatusBarButton) {
         guard let event = NSApp.currentEvent else { return }
 
-        if event.type == .rightMouseUp {
+        if event.type == .rightMouseUp || !meetingActive {
             showMenu()
         } else {
             MeetSwitcher.bringMeetToFront { [weak self] result in
-                switch result {
-                case .found:
-                    break
-                case .permissionDenied:
+                if case .permissionDenied = result {
                     self?.handlePermissionDenied()
-                default:
-                    self?.flashNoMeeting()
-                }
-            }
-        }
-    }
-
-    private func flashNoMeeting() {
-        statusItem.button?.image = Icon.make(active: true)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
-            self?.statusItem.button?.image = Icon.make(active: false)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                self?.statusItem.button?.image = Icon.make(active: true)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                    self?.statusItem.button?.image = Icon.make(active: false)
                 }
             }
         }
@@ -135,6 +114,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showMenu() {
         let menu = NSMenu()
+
+        if !meetingActive {
+            let noMeeting = NSMenuItem(title: "No active Google Meet", action: nil, keyEquivalent: "")
+            noMeeting.isEnabled = false
+            menu.addItem(noMeeting)
+            menu.addItem(.separator())
+        }
 
         let launchItem = NSMenuItem(
             title: "Launch at Login",
