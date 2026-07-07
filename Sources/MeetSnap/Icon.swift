@@ -20,6 +20,37 @@ enum Icon {
         button.alphaValue = 0.45
     }
 
+    private static func drawArrow(lineWidth: CGFloat) {
+        let shaftY: CGFloat = 19
+        let tailY: CGFloat = 15
+        let turnX: CGFloat = 18
+        let bulge: CGFloat = 3.5
+
+        let arrow = NSBezierPath()
+        arrow.lineWidth = lineWidth
+        arrow.lineCapStyle = .round
+        arrow.lineJoinStyle = .round
+
+        arrow.move(to: NSPoint(x: 10, y: shaftY))
+        arrow.line(to: NSPoint(x: turnX, y: shaftY))
+        arrow.curve(to: NSPoint(x: turnX, y: tailY),
+                   controlPoint1: NSPoint(x: turnX + bulge, y: shaftY),
+                   controlPoint2: NSPoint(x: turnX + bulge, y: tailY))
+        arrow.line(to: NSPoint(x: 14.5, y: tailY))
+
+        arrow.stroke()
+
+        // Arrowhead
+        let head = NSBezierPath()
+        head.lineWidth = lineWidth
+        head.lineCapStyle = .round
+        head.lineJoinStyle = .round
+        head.move(to: NSPoint(x: 12.5, y: 17))
+        head.line(to: NSPoint(x: 10, y: shaftY))
+        head.line(to: NSPoint(x: 12.5, y: 21))
+        head.stroke()
+    }
+
     private static func buildIcon(filled: Bool) -> NSImage {
         let size = NSSize(width: 22, height: 22)
         let image = NSImage(size: size, flipped: true) { _ in
@@ -37,42 +68,16 @@ enum Icon {
             lens.close()
             lens.lineJoinStyle = .round
 
-            // Return arrow — smooth curved shape
-            let arrow = NSBezierPath()
-            arrow.lineCapStyle = .round
-            arrow.lineJoinStyle = .round
-
             if filled {
                 body.fill()
                 lens.fill()
 
-                // Cut out G
                 let ctx = NSGraphicsContext.current!
                 ctx.compositingOperation = .destinationOut
                 drawG(at: NSPoint(x: 1, y: 3), fontSize: 8, weight: .bold)
                 ctx.compositingOperation = .sourceOver
 
-                // Filled arrow
-                arrow.move(to: NSPoint(x: 8, y: 19))
-                arrow.curve(to: NSPoint(x: 20, y: 19),
-                           controlPoint1: NSPoint(x: 10, y: 19),
-                           controlPoint2: NSPoint(x: 20, y: 19))
-                arrow.curve(to: NSPoint(x: 20, y: 14.5),
-                           controlPoint1: NSPoint(x: 22, y: 19),
-                           controlPoint2: NSPoint(x: 22, y: 14.5))
-
-                arrow.lineWidth = 1.5
-                arrow.stroke()
-
-                // Arrowhead
-                let head = NSBezierPath()
-                head.lineWidth = 1.5
-                head.lineCapStyle = .round
-                head.lineJoinStyle = .round
-                head.move(to: NSPoint(x: 10.5, y: 17))
-                head.line(to: NSPoint(x: 8, y: 19))
-                head.line(to: NSPoint(x: 10.5, y: 21))
-                head.stroke()
+                drawArrow(lineWidth: 1.5)
             } else {
                 body.lineWidth = 1.4
                 body.stroke()
@@ -80,27 +85,7 @@ enum Icon {
                 lens.stroke()
 
                 drawG(at: NSPoint(x: 1, y: 3), fontSize: 8, weight: .bold)
-
-                // Outlined arrow — same shape
-                arrow.move(to: NSPoint(x: 8, y: 19))
-                arrow.curve(to: NSPoint(x: 20, y: 19),
-                           controlPoint1: NSPoint(x: 10, y: 19),
-                           controlPoint2: NSPoint(x: 20, y: 19))
-                arrow.curve(to: NSPoint(x: 20, y: 14.5),
-                           controlPoint1: NSPoint(x: 22, y: 19),
-                           controlPoint2: NSPoint(x: 22, y: 14.5))
-
-                arrow.lineWidth = 1.4
-                arrow.stroke()
-
-                let head = NSBezierPath()
-                head.lineWidth = 1.4
-                head.lineCapStyle = .round
-                head.lineJoinStyle = .round
-                head.move(to: NSPoint(x: 10.5, y: 17))
-                head.line(to: NSPoint(x: 8, y: 19))
-                head.line(to: NSPoint(x: 10.5, y: 21))
-                head.stroke()
+                drawArrow(lineWidth: 1.4)
             }
 
             return true
