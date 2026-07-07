@@ -22,11 +22,11 @@ MeetSnap sits in your menu bar and brings your meeting back to the front with a 
 
 ## Features
 
-- **Click to switch** — click the menu bar icon to instantly focus your active Meet tab in Chrome
-- **At-a-glance status** — outlined icon means no meeting, filled icon means you're in one
-- **Smart polling** — only checks Chrome when it's running, zero CPU otherwise
-- **Launch at Login** — right-click the icon to enable
-- **First-run onboarding** — guides you through the one-time Automation permission setup
+- **At-a-glance status** — faint icon means no meeting, solid icon means you're in one
+- **Click to switch** — click the solid icon to instantly focus your active Meet tab
+- **Near-instant detection** — updates immediately when you switch to or from Chrome, with a 15s background poll as backup
+- **Lightweight** — ~5MB memory, zero CPU when Chrome isn't running
+- **Launch at Login** — enable from the dropdown menu
 
 ## Install
 
@@ -59,12 +59,12 @@ cp -R $(brew --prefix)/Cellar/meetsnap/1.0/MeetSnap.app /Applications/
 
 ## Usage
 
-| Action | Result |
-|---|---|
-| **Left-click** the menu bar icon | Switches to your active Google Meet tab |
-| **Right-click** the menu bar icon | Shows menu: Launch at Login, About, Quit |
-| Icon is **outlined** | No active meeting detected |
-| Icon is **filled** | You have a meeting running — click to go back |
+| State | Icon | Click |
+|---|---|---|
+| **No meeting** | Faint outlined camera+G | Opens menu: "No active Google Meet" |
+| **Meeting active** | Solid filled camera+G with return arrow | Switches to your Meet tab |
+
+Right-click always opens the menu (Launch at Login, About, Quit).
 
 ## Permissions
 
@@ -74,9 +74,9 @@ If you accidentally deny it, go to **System Settings > Privacy & Security > Auto
 
 ## How It Works
 
-MeetSnap uses macOS [NSWorkspace](https://developer.apple.com/documentation/appkit/nsworkspace) notifications to detect when Chrome launches or quits. While Chrome is running, it checks every 15 seconds (via AppleScript on a background thread) for tabs matching `meet.google.com` with an active meeting code. When you click the icon, it tells Chrome to activate that tab and bring the window to the front.
+MeetSnap uses macOS [NSWorkspace](https://developer.apple.com/documentation/appkit/nsworkspace) notifications to detect when Chrome launches, quits, or gains/loses focus. When Chrome is involved in an app switch, MeetSnap immediately checks for tabs matching `meet.google.com` with an active meeting code. A 15-second background poll serves as a backup. All AppleScript execution runs on a background thread.
 
-The entire app is ~450 lines of Swift with zero dependencies.
+~500 lines of Swift, zero dependencies.
 
 ## Requirements
 
