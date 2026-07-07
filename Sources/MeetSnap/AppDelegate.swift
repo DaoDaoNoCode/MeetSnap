@@ -9,6 +9,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var permissionAlertShown = false
 
     private static let chromeBundleID = "com.google.Chrome"
+    private var previousActiveApp: String?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
@@ -28,6 +29,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         wsnc.addObserver(
             self, selector: #selector(appTerminated(_:)),
             name: NSWorkspace.didTerminateApplicationNotification, object: nil
+        )
+        wsnc.addObserver(
+            self, selector: #selector(appActivated(_:)),
+            name: NSWorkspace.didActivateApplicationNotification, object: nil
         )
 
         if OnboardingWindowController.hasSeenOnboarding {
@@ -55,6 +60,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
               app.bundleIdentifier == Self.chromeBundleID else { return }
         startPolling()
+    }
+
+    @objc private func appActivated(_ notification: Notification) {
+        guard let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
+        let bundleId = app.bundleIdentifier
+
+        if bundleId == Self.chromeBundleID || previousActiveApp == Self.chromeBundleID {
+            silentCheck()
+        }
+        previousActiveApp = bundleId
     }
 
     @objc private func appTerminated(_ notification: Notification) {
